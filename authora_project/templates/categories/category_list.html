@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+    {% extends 'base.html' %}
+
+{% block content %}
+
+<div class="category-wrapper">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-semibold">Categories</h3>
+
+<a href="{% url 'category_create' %}" class="btn btn-dark">
+Add Category
+</a>
+
+</div>
+
+
+<div class="table-card">
+
+<table class="table category-table">
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Parent</th>
+<th class="text-center">Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for category in categories %}
+
+<tr>
+
+<td>{{ category.id }}</td>
+
+<td>{{ category.title }}</td>
+
+<td>{{ category.parent }}</td>
+
+<td class="text-center">
+
+<a href="{% url 'category_update' category.id %}" class="btn btn-sm btn-outline-dark">
+Edit
+</a>
+
+<a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-outline-danger">
+Delete
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4" class="text-center text-muted">
+No categories available
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% endblock %}
+    </body>
+</html>

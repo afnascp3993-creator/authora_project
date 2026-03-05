@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+       {% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<img src="{{ post.image.url }}" class="card-img-top" style="height:350px; object-fit:cover;">
+
+<div class="card-body">
+
+<h2>{{ post.title }}</h2>
+
+<p class="text-muted">Category: {{ post.category.title }}</p>
+
+<hr>
+
+<p>{{ post.content }}</p>
+
+</div>
+
+</div>
+
+<!-- Navigation -->
+
+<div class="d-flex justify-content-between mt-4">
+
+{% if prev_post %}
+<a href="{% url 'post_detail' prev_post.id %}" class="btn btn-outline-primary">
+⬅ Previous
+</a>
+{% endif %}
+
+{% if next_post %}
+<a href="{% url 'post_detail' next_post.id %}" class="btn btn-outline-primary">
+Next ➡
+</a>
+{% endif %}
+
+</div>
+
+<!-- Related Posts -->
+
+<h4 class="mt-5">Related Posts</h4>
+
+<div class="row">
+
+{% for r in related_posts %}
+
+<div class="col-md-4 mb-3">
+
+<div class="card">
+
+<img src="{{ r.image.url }}" class="card-img-top" style="height:180px; object-fit:cover;">
+
+<div class="card-body">
+
+<h6>{{ r.title }}</h6>
+
+<a href="{% url 'post_detail' r.id %}" class="btn btn-sm btn-primary">
+Read More
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}
+        
+        <script src="" async defer></script>
+    </body>
+</html>

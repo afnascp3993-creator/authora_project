@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f6fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2f3640;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: #40739e;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+        .navbar h1 {
+            font-size: 28px;
+            color: #2f3640;
+        }
+
+        .navbar button {
+            padding: 8px 15px;
+            background-color: #e84118;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .navbar button:hover {
+            background-color: #c23616;
+        }
+
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2f3640;
+        }
+
+        .card p {
+            font-size: 24px;
+            font-weight: 500;
+            color: #40739e;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #40739e;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #dcdde1;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .sidebar h2 {
+                display: none;
+            }
+            .sidebar a {
+                flex: 1;
+                text-align: center;
+            }
+                        .online {
+                color: #44bd32;
+                font-weight: 500;
+            }
+
+            .offline {
+                color: #7f8fa6;
+                font-weight: 500;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">Create Users</a>
+        <a href="{% url 'authenticator' %}">Authenticator</a>
+        <a href="#">Settings</a>
+        <a href="{% url 'user_post_list' %}">Post</a>
+        <a href="{% url 'category_list' %}">Category</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <div class="navbar">
+            <h1>Welcome, {{ user.username }}</h1>
+            <button onclick="window.location.href='{% url 'logout' %}'" >Logout</button>
+            
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Users</h3>
+                <p>{{ users|length }}</p>
+            </div>
+            <div class="card">
+                <h3>Active Users</h3>
+                <p>{{ online_users|length }}</p>
+            </div>
+            <div class="card">
+                <h3>New Reports</h3>
+                <p>5</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <h2>User List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                        <span class="{% if user.is_online %}online{% else %}offline{% endif %}">
+                            ● {% if user.is_online %}Online{% else %}Offline{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center;">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+    <script>
+    setInterval(function() {
+        fetch("{% url 'update_activity' %}");
+    }, 1);
+    </script>
+</html>
