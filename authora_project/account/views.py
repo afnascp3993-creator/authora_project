@@ -73,3 +73,36 @@ def register(request):
 
     return render(request, "register.html")
 
+
+def create_user_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        password = request.POST.get("password", "").strip()
+        role = request.POST.get("role", "user")
+
+        if not all([username, email, phone, password]):
+            messages.error(request, "All fields are required.")
+            return redirect("create_user")
+
+        if UserRegistration.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("create_user")
+
+        if UserRegistration.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect("create_user")
+
+        UserRegistration.objects.create(
+            username=username,
+            email=email,
+            phone=phone,
+            password=password,
+            roles=role,
+        )
+        messages.success(request, f"User '{username}' created successfully!")
+        return redirect("create_user")
+
+    users = UserRegistration.objects.all().order_by("-id")
+    return render(request, "create_user.html", {"users": users})

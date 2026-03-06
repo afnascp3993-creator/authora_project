@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Users</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --white: #f7f7f5;
+            --grey-100: #ebebeb;
+            --grey-200: #d4d4d4;
+            --grey-400: #9a9a9a;
+            --grey-600: #5a5a5a;
+            --grey-800: #2a2a2a;
+            --sidebar-w: 240px;
+            --radius: 4px;
+            --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--white);
+            font-family: 'Syne', sans-serif;
+            color: var(--black);
+        }
+
+        /* ─── BACKGROUND GRID ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background-color: var(--black);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        /* Brand */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding: 0 6px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--black);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand h2 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        .sidebar-brand span {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--grey-600);
+        }
+
+        /* Nav */
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--grey-600);
+            padding: 0 10px;
+            margin: 20px 0 8px;
+        }
+
+        .nav-label:first-child { margin-top: 0; }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--grey-400);
+            text-decoration: none;
+            padding: 10px 10px;
+            margin: 2px 0;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            width: 3px;
+            height: 0;
+            background: var(--white);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: height var(--transition);
+            border-radius: 2px;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--white);
+            background: rgba(255,255,255,0.07);
+        }
+
+        .sidebar-nav a:hover::before,
+        .sidebar-nav a.active::before {
+            height: 60%;
+        }
+
+        .nav-icon {
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            filter: grayscale(1);
+        }
+
+        /* Footer */
+        .sidebar-footer {
+            padding-top: 20px;
+            border-top: 1px solid var(--grey-800);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--grey-600);
+            text-decoration: none;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .sidebar-footer a:hover { color: var(--white); }
+
+        /* ─── MAIN CONTENT ─── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+        }
+
+        /* ─── TOPBAR ─── */
+        .topbar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 36px 40px 28px;
+            border-bottom: 1px solid var(--grey-100);
+            animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .topbar-left .page-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--black);
+        }
+
+        .back-btn {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+            padding-bottom: 1px;
+        }
+
+        .back-btn:hover {
+            color: var(--black);
+            border-color: var(--black);
+        }
+
+        /* ─── PAGE CONTENT ─── */
+        .page-content {
+            padding: 32px 40px;
+            animation: fadeUp 0.45s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── ALERTS ─── */
+        .alert {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            border: 1px solid var(--grey-200);
+            color: var(--grey-600);
+            background: var(--grey-100);
+        }
+
+        .alert.error, .alert.danger {
+            background: #fff0f0;
+            border-color: #e0b0b0;
+            color: #8b0000;
+        }
+
+        .alert.success {
+            background: var(--grey-100);
+            border-color: var(--grey-200);
+            color: var(--black);
+        }
+
+        /* ─── CONTENT GRID ─── */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ─── FORM CARD ─── */
+        .form-card {
+            background: var(--black);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            position: relative;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--white);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .form-card h2 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--white);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-card h2 .card-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--grey-600);
+            margin-left: auto;
+        }
+
+        /* Fields */
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            margin-bottom: 7px;
+            font-weight: 500;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--grey-800);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 500;
+            background: #1a1a1a;
+            color: var(--white);
+            outline: none;
+            transition: var(--transition);
+            appearance: none;
+        }
+
+        .field input::placeholder {
+            color: var(--grey-600);
+            font-weight: 400;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--white);
+            background: #222;
+            box-shadow: 0 0 0 3px rgba(247,247,245,0.06);
+        }
+
+        .select-wrap {
+            position: relative;
+        }
+
+        .select-wrap::after {
+            content: '↓';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--grey-400);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .field select option {
+            background: #1a1a1a;
+            color: var(--white);
+        }
+
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 13px;
+            background: var(--white);
+            border: 1.5px solid var(--white);
+            border-radius: var(--radius);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color var(--transition);
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--black);
+            border: 1.5px solid var(--white);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+            z-index: 0;
+        }
+
+        .submit-btn:hover::after { transform: scaleX(1); transform-origin: left; }
+        .submit-btn:hover { color: var(--white); }
+        .submit-btn span { position: relative; z-index: 1; }
+
+        /* ─── TABLE CARD ─── */
+        .table-card {
+            background: var(--white);
+            border: 1px solid var(--grey-100);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--grey-100);
+        }
+
+        .table-card-header h2 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--black);
+        }
+
+        .user-count {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead th {
+            padding: 11px 20px;
+            text-align: left;
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            font-weight: 500;
+            background: var(--black);
+            border-bottom: 1px solid var(--grey-800);
+        }
+
+        table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--grey-100);
+            font-size: 13px;
+            font-weight: 500;
+            vertical-align: middle;
+            transition: background var(--transition);
+        }
+
+        table tbody tr:last-child td { border-bottom: none; }
+
+        table tbody tr:hover td { background: var(--grey-100); }
+
+        /* User cell */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Cycling avatar shades */
+        .v1 { background: var(--black); color: var(--white); }
+        .v2 { background: var(--grey-800); color: var(--white); }
+        .v3 { background: var(--grey-600); color: var(--white); }
+        .v4 { background: var(--grey-200); color: var(--black); }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .user-email {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--grey-400);
+            letter-spacing: 0.03em;
+            margin-top: 2px;
+        }
+
+        /* Role badge */
+        .role-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 2px;
+        }
+
+        .role-badge.admin {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .role-badge.user {
+            background: var(--grey-100);
+            color: var(--grey-600);
+            border: 1px solid var(--grey-200);
+        }
+
+        /* Empty row */
+        .empty-row td {
+            text-align: center;
+            padding: 48px 20px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                padding: 14px 16px;
+                gap: 4px;
+                position: relative;
+                overflow-x: auto;
+            }
+
+            .sidebar-brand { display: none; }
+            .nav-label { display: none; }
+            .sidebar-footer { display: none; }
+            .sidebar-nav { flex-direction: row; }
+            .sidebar-nav a { flex-shrink: 0; font-size: 11px; padding: 8px 12px; }
+
+            .topbar, .page-content { padding: 20px; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">A</div>
+            <div>
+                <h2>Authora</h2>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-label">Main</div>
+            <a href="{% url 'admin_dashboard' %}">
+                <span class="nav-icon">⌂</span> Dashboard
+            </a>
+          
+            <div class="nav-label">System</div>
+            <a href="#">
+                <span class="nav-icon">◎</span> Settings
+            </a>
+            
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#">
+                <span>←</span> Log out
+            </a>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="page-label">User Management</div>
+                <h1>Create Users</h1>
+            </div>
+            <a href="{% url 'admin_dashboard' %}" class="back-btn">← Back to Dashboard</a>
+        </div>
+
+        <div class="page-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="content-grid">
+
+                <!-- Create Form -->
+                <div class="form-card">
+                    <h2>
+                        New User
+                        <span class="card-label">Create</span>
+                    </h2>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="field">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required placeholder="Enter username">
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="user@example.com">
+                        </div>
+
+                        <div class="field">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" required placeholder="+91">
+                        </div>
+
+                        <div class="field">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required placeholder="Set a password">
+                        </div>
+
+                        <div class="field">
+                            <label for="role">Role</label>
+                            <div class="select-wrap">
+                                <select id="role" name="role">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn"><span>Create User →</span></button>
+                    </form>
+                </div>
+
+                <!-- Existing Users Table -->
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h2>Existing Users</h2>
+                        <span class="user-count">{{ users|length }} total</span>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--grey-400);">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar {% cycle 'v1' 'v2' 'v3' 'v4' %}">
+                                            {{ u.username|first|upper }}
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="user-name">{{ u.username }}</div>
+                                            <div class="user-email">{{ u.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--grey-400);">{{ u.phone }}</td>
+                                <td>
+                                    <span class="role-badge {{ u.roles }}">{{ u.roles }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr class="empty-row">
+                                <td colspan="4">— no users yet —</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
